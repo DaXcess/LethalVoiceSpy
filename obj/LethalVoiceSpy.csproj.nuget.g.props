@@ -4,16 +4,16 @@
     <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/home/daxcess/.nuget/packages/</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/home/daxcess/.nuget/packages/</NuGetPackageFolders>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\DaXcess\.nuget\packages\</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
     <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.9.1</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <SourceRoot Include="/home/daxcess/.nuget/packages/" />
+    <SourceRoot Include="C:\Users\DaXcess\.nuget\packages\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgBepInEx_Core Condition=" '$(PkgBepInEx_Core)' == '' ">/home/daxcess/.nuget/packages/bepinex.core/5.4.21</PkgBepInEx_Core>
-    <PkgBepInEx_Analyzers Condition=" '$(PkgBepInEx_Analyzers)' == '' ">/home/daxcess/.nuget/packages/bepinex.analyzers/1.0.8</PkgBepInEx_Analyzers>
+    <PkgBepInEx_Core Condition=" '$(PkgBepInEx_Core)' == '' ">C:\Users\DaXcess\.nuget\packages\bepinex.core\5.4.21</PkgBepInEx_Core>
+    <PkgBepInEx_Analyzers Condition=" '$(PkgBepInEx_Analyzers)' == '' ">C:\Users\DaXcess\.nuget\packages\bepinex.analyzers\1.0.8</PkgBepInEx_Analyzers>
   </PropertyGroup>
 </Project>

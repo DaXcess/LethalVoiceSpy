@@ -1,38 +1,42 @@
+using System;
 using System.IO;
 using BepInEx;
-using Dissonance.Audio;
 using GameNetcodeStuff;
-using NAudio.Wave;
 using UnityEngine;
 
 namespace LethalVoiceSpy;
 
 public class VoiceSpy : MonoBehaviour
 {
-    private AudioFileWriter writer;
+    internal PlayerControllerB player;
+
+    private AudioEncoder encoder;
+    private FileStream file;
     
-    private void Awake()
+    private void Start()
     {
         var directory = Path.Combine(Paths.GameRootPath, "VoiceSpy");
 
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
+
+        var time = DateTime.Now.ToString("yy-MM-dd_hh_mm_ss");
+        var path = Path.Combine(directory, $"Voice_{player.playerUsername}_{time}.aac");
         
-        var playerController = GetComponent<PlayerControllerB>();
-        var filename = $"Voice_{playerController.playerUsername}_{playerController.actualClientId}.wav";
-        var path = Path.Combine(directory, filename);
-        
-        // TODO: Figure out Wave Format
-        writer = new AudioFileWriter(path, new WaveFormat(441000, 2));
+        encoder = new AudioEncoder();
+        file = File.Create(path);
     }
 
-    private void OnAudioFilterRead(float[] data, int channels)
+    public void ProcessAudioPacket(float[] samples)
     {
-        writer.WriteSamples(data);
+        var data = encoder.EncodeSamples(samples);
+
+        file.Write(data, 0, data.Length);
     }
 
     private void OnDestroy()
     {
-        writer.Dispose();
+        encoder.Dispose();
+        file.Close();
     }
 }

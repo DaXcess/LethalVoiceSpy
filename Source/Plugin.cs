@@ -1,7 +1,13 @@
-﻿using BepInEx;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using BepInEx;
 using Dissonance;
+using Dissonance.Audio.Playback;
+using Dissonance.Integrations.Unity_NFGO;
+using GameNetcodeStuff;
 using HarmonyLib;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace LethalVoiceSpy;
 
@@ -15,12 +21,16 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         LethalVoiceSpy.Logger.SetSource(Logger);
+
+        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
     }
 }
 
 [HarmonyPatch]
 internal static class Patches
 {
+    private static Dictionary<string, VoiceSpy> activeSpies = [];
+    
     [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Start))]
     [HarmonyPostfix]
     private static void OnGameStart()
@@ -31,13 +41,38 @@ internal static class Patches
         dissonance.OnPlayerLeftSession += OnPlayerLeftSession;
     }
 
+    [HarmonyPatch(typeof(SpeechSession), nameof(SpeechSession.Read))]
+    [HarmonyPostfix]
+    private static void OnVoicePacketProcessed(ref SpeechSession __instance, ref ArraySegment<float> samples)
+    {
+        if (samples.Array == SpeechSession.DesyncFixBuffer)
+            return;
+        
+        if (!activeSpies.TryGetValue(__instance.Context.PlayerName, out var spy))
+            return;
+
+        spy.ProcessAudioPacket(samples.Array);
+    }
+
     private static void OnPlayerJoinedSession(VoicePlayerState state)
     {
-        Logger.LogDebug($"Player joined: {state.Tracker}");
+        if (state.PlaybackInternal is not VoicePlayback playback)
+            return;
+        
+        if (state.Tracker is not NfgoPlayer nfgoPlayer)
+            return;
+        
+        var spy = playback.gameObject.AddComponent<VoiceSpy>();
+        spy.player = nfgoPlayer.GetComponent<PlayerControllerB>();
+        
+        activeSpies.Add(state.Name, spy);
     }
 
     private static void OnPlayerLeftSession(VoicePlayerState state)
     {
-        Logger.LogDebug($"Player left: {state.Tracker}");
+        if (!activeSpies.Remove(state.Name, out var spy))
+            return;
+
+        Object.Destroy(spy);
     }
 }

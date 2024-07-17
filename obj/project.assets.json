@@ -560,6 +560,15 @@
           }
         }
       },
+      "Unity.Netcode.Runtime/1.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/Unity.Netcode.Runtime.def.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/Unity.Netcode.Runtime.def.dll": {}
+        }
+      },
       "UnityEngine.Modules/2022.3.9": {
         "type": "package",
         "compile": {
@@ -2489,6 +2498,17 @@
         "system.threading.tasks.nuspec"
       ]
     },
+    "Unity.Netcode.Runtime/1.6.0": {
+      "sha512": "U7h+aBIVpe/AQ4uWf8YDeRTMhmW7x1FE6IZvPA8Cgsz2tas2sVXY02N/EhkjpJG6P1mFscrMo1+IftbaDweZoQ==",
+      "type": "package",
+      "path": "unity.netcode.runtime/1.6.0",
+      "files": [
+        ".nupkg.metadata",
+        "lib/netstandard2.1/Unity.Netcode.Runtime.def.dll",
+        "unity.netcode.runtime.1.6.0.nupkg.sha512",
+        "unity.netcode.runtime.nuspec"
+      ]
+    },
     "UnityEngine.Modules/2022.3.9": {
       "sha512": "sSxqZjd05U0NWlX+eappdlsEuXFvDRHkUaClDVTocGRzCmIwNvgGJIPh22lGklIpNZ3cJZneYJkIUnEIazR8VA==",
       "type": "package",
@@ -2704,29 +2724,32 @@
       "BepInEx.Core >= 5.*",
       "DissonanceVoip >= 1.50.0-lc.1",
       "LethalCompany >= 1.56.0",
+      "Unity.Netcode.Runtime >= 1.6.0",
       "UnityEngine.Modules >= 2022.3.9"
     ]
   },
   "packageFolders": {
-    "/home/daxcess/.nuget/packages/": {}
+    "C:\\Users\\DaXcess\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/daxcess/Projects/LethalVoiceSpy/LethalVoiceSpy.csproj",
+      "projectUniqueName": "F:\\LethalVoiceSpy\\LethalVoiceSpy.csproj",
       "projectName": "LethalVoiceSpy",
-      "projectPath": "/home/daxcess/Projects/LethalVoiceSpy/LethalVoiceSpy.csproj",
-      "packagesPath": "/home/daxcess/.nuget/packages/",
-      "outputPath": "/home/daxcess/Projects/LethalVoiceSpy/obj/",
+      "projectPath": "F:\\LethalVoiceSpy\\LethalVoiceSpy.csproj",
+      "packagesPath": "C:\\Users\\DaXcess\\.nuget\\packages\\",
+      "outputPath": "F:\\LethalVoiceSpy\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/daxcess/Projects/LethalVoiceSpy/NuGet.Config",
-        "/home/daxcess/.nuget/NuGet/NuGet.Config"
+        "F:\\LethalVoiceSpy\\NuGet.Config",
+        "C:\\Users\\DaXcess\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netstandard2.1"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {},
         "https://api.nuget.org/v3/index.json": {},
         "https://nuget.bepinex.dev/v3/index.json": {},
@@ -2767,6 +2790,10 @@
             "target": "Package",
             "version": "[1.56.0, )"
           },
+          "Unity.Netcode.Runtime": {
+            "target": "Package",
+            "version": "[1.6.0, )"
+          },
           "UnityEngine.Modules": {
             "include": "Compile",
             "target": "Package",
@@ -2779,7 +2806,8 @@
           "net47",
           "net471",
           "net472",
-          "net48"
+          "net48",
+          "net481"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -2788,7 +2816,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.131/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.206\\RuntimeIdentifierGraph.json"
       }
     }
   }
