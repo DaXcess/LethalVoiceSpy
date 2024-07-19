@@ -25,13 +25,13 @@ public class AudioEncoder : IDisposable
             throw new IOException("Failed to create AAC encoder");
     }
 
-    public unsafe byte[] EncodeSamples(float[] samples)
+    public unsafe byte[] EncodeSamples(ArraySegment<float> samples)
     {
-        var sampleCount = samples.Length;
-        
-        fixed (float* p = samples)
+        var sampleCount = samples.Count;
+
+        fixed (float* p = samples.Array)
         {
-            if (!ffi_Encode(encoder, (IntPtr)p, (uint)sampleCount, out var data, out var dataLength))
+            if (!ffi_Encode(encoder, (IntPtr)(p + samples.Offset), (uint)sampleCount, out var data, out var dataLength))
                 throw new IOException("Failed to encode samples");
 
             var result = new byte[dataLength];

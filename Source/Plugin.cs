@@ -7,6 +7,7 @@ using Dissonance.Audio.Playback;
 using Dissonance.Integrations.Unity_NFGO;
 using GameNetcodeStuff;
 using HarmonyLib;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace LethalVoiceSpy;
@@ -41,18 +42,18 @@ internal static class Patches
         dissonance.OnPlayerLeftSession += OnPlayerLeftSession;
     }
 
-    [HarmonyPatch(typeof(SpeechSession), nameof(SpeechSession.Read))]
-    [HarmonyPostfix]
-    private static void OnVoicePacketProcessed(ref SpeechSession __instance, ref ArraySegment<float> samples)
-    {
-        if (samples.Array == SpeechSession.DesyncFixBuffer)
-            return;
-        
-        if (!activeSpies.TryGetValue(__instance.Context.PlayerName, out var spy))
-            return;
-
-        spy.ProcessAudioPacket(samples.Array);
-    }
+    // [HarmonyPatch(typeof(SpeechSession), nameof(SpeechSession.Read))]
+    // [HarmonyPostfix]
+    // private static void OnVoicePacketProcessed(ref SpeechSession __instance, ref ArraySegment<float> samples)
+    // {
+    //     if (samples.Array == SpeechSession.DesyncFixBuffer)
+    //         return;
+    //     
+    //     if (!activeSpies.TryGetValue(__instance.Context.PlayerName, out var spy))
+    //         return;
+    //
+    //     spy.ProcessAudioPacket(samples.Array);
+    // }
 
     private static void OnPlayerJoinedSession(VoicePlayerState state)
     {
@@ -61,9 +62,22 @@ internal static class Patches
         
         if (state.Tracker is not NfgoPlayer nfgoPlayer)
             return;
+
+        var spyObject = new GameObject($"{playback.PlayerName} Voice Spy")
+        {
+            transform =
+            {
+                parent = playback.transform,
+                localPosition = Vector3.zero
+            }
+        };
+
+        spyObject.AddComponent<AudioSource>();
+        spyObject.AddComponent<SampleSpyComponent>();
         
-        var spy = playback.gameObject.AddComponent<VoiceSpy>();
-        spy.player = nfgoPlayer.GetComponent<PlayerControllerB>();
+        var spy = spyObject.AddComponent<VoiceSpy>();
+        
+        spy.PlayerUsername = nfgoPlayer.GetComponent<PlayerControllerB>().playerUsername;
         
         activeSpies.Add(state.Name, spy);
     }
@@ -73,6 +87,6 @@ internal static class Patches
         if (!activeSpies.Remove(state.Name, out var spy))
             return;
 
-        Object.Destroy(spy);
+        Object.Destroy(spy.gameObject);
     }
 }
