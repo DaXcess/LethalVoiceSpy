@@ -87,13 +87,13 @@ public class VoiceSpy : MonoBehaviour
             _audioSource.mute = false;
     }
 
-    public void StartPlayback()
+    public void StartCapture()
     {
         // This frame format determines the *incoming* audio format (which is always Opus, 48kHz, Mono with a frame size of 960 frames)
         _sessions.StartSession(new FrameFormat(Codec.Opus, new WaveFormat(48000, 1), 960));
     }
 
-    public void StopPlayback()
+    public void StopCapture()
     {
         _sessions.StopSession();
     }

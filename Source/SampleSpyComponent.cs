@@ -50,17 +50,16 @@ public class SampleSpyComponent : MonoBehaviour
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
-        if (!HasActiveSession)
-        {
-            Array.Clear(_temp, 0, _temp.Length);
-            Array.Clear(data, 0, data.Length);
-            return;
-        }
-        
-        _sessionLock.EnterUpgradeableReadLock();
-
         try
         {
+            if (!HasActiveSession)
+            {
+                Array.Clear(_temp, 0, _temp.Length);
+                Array.Clear(data, 0, data.Length);
+                return;
+            }
+
+            _sessionLock.EnterUpgradeableReadLock();
             try
             {
                 if (Session is not { } session)

@@ -5,6 +5,7 @@ using BepInEx;
 using Dissonance;
 using Dissonance.Audio.Playback;
 using Dissonance.Integrations.Unity_NFGO;
+using Dissonance.Networking;
 using GameNetcodeStuff;
 using HarmonyLib;
 using UnityEngine;
@@ -40,6 +41,36 @@ internal static class Patches
         
         dissonance.OnPlayerJoinedSession += OnPlayerJoinedSession;
         dissonance.OnPlayerLeftSession += OnPlayerLeftSession;
+    }
+
+    [HarmonyPatch(typeof(SpeechSessionStream), nameof(SpeechSessionStream.ReceiveFrame))]
+    [HarmonyPrefix]
+    private static void ReceiveAudioPacket(SpeechSessionStream __instance, ref VoicePacket packet)
+    {
+        if (!activeSpies.TryGetValue(__instance.PlayerName, out var spy))
+            return;
+        
+        spy.ReceiveAudioPacket(packet);
+    }
+
+    [HarmonyPatch(typeof(SpeechSessionStream), nameof(SpeechSessionStream.StartSession))]
+    [HarmonyPostfix]
+    private static void OnStartSpeaking(SpeechSessionStream __instance)
+    {
+        if (!activeSpies.TryGetValue(__instance.PlayerName, out var spy))
+            return;
+        
+        spy.StartCapture();
+    }
+
+    [HarmonyPatch(typeof(SpeechSessionStream), nameof(SpeechSessionStream.StopSession))]
+    [HarmonyPostfix]
+    private static void OnStopSpeaking(SpeechSessionStream __instance)
+    {
+        if (!activeSpies.TryGetValue(__instance.PlayerName, out var spy))
+            return;
+        
+        spy.StopCapture();
     }
 
     // [HarmonyPatch(typeof(SpeechSession), nameof(SpeechSession.Read))]
