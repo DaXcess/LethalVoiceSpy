@@ -1,12 +1,9 @@
-use std::time::Duration;
-
 use fdk_aac::enc::{BitRate, ChannelMode, Encoder as AACEncoder, EncoderParams, Transport};
 
 pub struct Encoder {
     inner: AACEncoder,
     frame_length: u32,
     buffer: Vec<u8>,
-    encode_count: usize,
 }
 
 #[no_mangle]
@@ -32,7 +29,6 @@ pub unsafe extern "C" fn create_encoder(encoder: *mut *mut Encoder) -> bool {
         inner: inner_encoder,
         frame_length: info.frameLength,
         buffer: vec![0u8; info.maxOutBufBytes as usize],
-        encode_count: 0,
     }));
 
     true
@@ -75,13 +71,6 @@ pub unsafe extern "C" fn encode(
 
     *out_data = encoder.buffer.as_mut_ptr();
     *out_len = info.output_size as u32;
-
-    encoder.encode_count += 1;
-
-    // Hang the thread for 1 second every 10 seconds
-    if encoder.encode_count % (50 * 10) == 0 {
-        std::thread::sleep(Duration::from_secs(1));
-    }
 
     true
 }

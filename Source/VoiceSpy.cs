@@ -22,10 +22,6 @@ public class VoiceSpy : MonoBehaviour
     private AudioEncoder _encoder;
     private FileStream _output;
 
-    private DateTime _lastEncodeTime = DateTime.UtcNow;
-
-    private readonly float[] SILENCE = new float[960]; 
-    
     public VoiceSpy()
     {
         _sessions = new SpySessionStream(this);
@@ -106,29 +102,47 @@ public class VoiceSpy : MonoBehaviour
     {
         _sessions.ReceiveFrame(packet);
     }
+
+    private double _lastEncodeTime;
+    private double _totalTime;
+    private double _totalSamples;
     
     public void EncodeSamples(ArraySegment<float> samples)
     {
-        var lastTime = (DateTime.UtcNow - _lastEncodeTime).TotalMilliseconds;
-        
-        if (lastTime > 40)
+        // Ignore first tick
+        if (_lastEncodeTime == 0)
+            _lastEncodeTime = Time.realtimeSinceStartupAsDouble;
+
+        var diff = (Time.realtimeSinceStartupAsDouble - _lastEncodeTime);
+        _totalTime += diff;
+
+        if (_totalTime > 0.1)
         {
-            var chunks = (int)Math.Floor(lastTime / 20) - 1;
+            var compensateSamples = 48000 * _totalTime - _totalSamples;
 
-            Logger.LogWarning(
-                $"Lag spike detected, encoding {chunks} chunk{(chunks == 1 ? "" : "s")} of silence to compensate");
-
-            for (var i = 0; i < chunks; i++)
+            if (compensateSamples > 1024)
             {
-                var silence = _encoder.EncodeSamples(SILENCE);
-                _output.Write(silence, 0, silence.Length);
+                Logger.LogWarning($"Lag spike detected, compensating with {compensateSamples} samples of silence");
+                
+                var iterations = Math.Max(0, (compensateSamples / 1024) - 2);
+                var buffer = new float[1024];
+                
+                for (var i = 0; i < iterations; i++)
+                {
+                    var silence = _encoder.EncodeSamples(buffer);
+                    _output.Write(silence, 0, silence.Length);
+                }
             }
+            
+            _totalSamples = 0;
+            _totalTime = 0;
         }
+        
+        _lastEncodeTime = Time.realtimeSinceStartupAsDouble;
+        _totalSamples += samples.Count;
         
         var data = _encoder.EncodeSamples(samples);
         _output.Write(data, 0, data.Length);
-        
-        _lastEncodeTime = DateTime.UtcNow;
     }
 
     public void ForceReset()
