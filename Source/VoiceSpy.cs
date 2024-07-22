@@ -21,6 +21,10 @@ public class VoiceSpy : MonoBehaviour
     
     private AudioEncoder _encoder;
     private FileStream _output;
+
+    private DateTime _lastEncodeTime = DateTime.UtcNow;
+
+    private readonly float[] SILENCE = new float[960]; 
     
     public VoiceSpy()
     {
@@ -41,7 +45,7 @@ public class VoiceSpy : MonoBehaviour
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        var time = DateTime.Now.ToString("yy-MM-dd_hh_mm_ss");
+        var time = DateTime.Now.ToString("yy-MM-dd_HH_mm_ss");
         var path = Path.Combine(directory, $"Voice_{PlayerUsername}_{time}.aac");
 
         _encoder = new AudioEncoder();
@@ -63,7 +67,7 @@ public class VoiceSpy : MonoBehaviour
         _audioSource.spatialBlend = 0;
         
         // TODO: Make this 0 once testing concludes
-        _audioSource.volume = 1;
+        _audioSource.volume = 0;
     }
 
     private void OnDisable()
@@ -102,12 +106,29 @@ public class VoiceSpy : MonoBehaviour
     {
         _sessions.ReceiveFrame(packet);
     }
-
+    
     public void EncodeSamples(ArraySegment<float> samples)
     {
-        var data = _encoder.EncodeSamples(samples);
+        var lastTime = (DateTime.UtcNow - _lastEncodeTime).TotalMilliseconds;
+        
+        if (lastTime > 40)
+        {
+            var chunks = (int)Math.Floor(lastTime / 20) - 1;
 
+            Logger.LogWarning(
+                $"Lag spike detected, encoding {chunks} chunk{(chunks == 1 ? "" : "s")} of silence to compensate");
+
+            for (var i = 0; i < chunks; i++)
+            {
+                var silence = _encoder.EncodeSamples(SILENCE);
+                _output.Write(silence, 0, silence.Length);
+            }
+        }
+        
+        var data = _encoder.EncodeSamples(samples);
         _output.Write(data, 0, data.Length);
+        
+        _lastEncodeTime = DateTime.UtcNow;
     }
 
     public void ForceReset()

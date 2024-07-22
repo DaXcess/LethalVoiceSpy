@@ -17,16 +17,15 @@ public class SpySessionStream(VoiceSpy spy) : IJitterEstimator
     
     public float Jitter => _arrivalJitterMeter.StdDev;
     public float Confidence => _arrivalJitterMeter.Confidence;
-    public string PlayerName => spy.PlayerName;
 
     public void StartSession(FrameFormat format, DateTime? now = null, IJitterEstimator jitter = null)
     {
-        if (PlayerName == null)
+        if (spy.PlayerName == null)
             throw new IOException("Attempted to `StartSession` but `PlayerName` is null");
         
         _active = DecoderPipelinePool.GetDecoderPipeline(format, new ConstVolumeProvider(1));
 
-        var session = SpySession.Create(new SessionContext(PlayerName, _currentId), jitter ?? this, _active, _active,
+        var session = SpySession.Create(new SessionContext(spy.PlayerName, _currentId), jitter ?? this, _active, _active,
             now ?? DateTime.UtcNow);
 
         _currentId++;
