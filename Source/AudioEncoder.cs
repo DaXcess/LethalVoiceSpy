@@ -27,6 +27,9 @@ public class AudioEncoder : IDisposable
 
     public unsafe byte[] EncodeSamples(ArraySegment<float> samples)
     {
+        if (disposed)
+            throw new IOException("Cannot encode audio when the encoder has been disposed");
+        
         var sampleCount = samples.Count;
 
         fixed (float* p = samples.Array)
