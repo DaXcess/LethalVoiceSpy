@@ -41,7 +41,7 @@ public class VoiceSpy : MonoBehaviour
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        var time = DateTime.Now.ToString("yy-MM-dd_HH_mm_ss");
+        var time = DateTime.Now.ToString("yy-MM-dd_HH_mm_ss.fff");
         var path = Path.Combine(directory, $"Voice_{PlayerUsername}_{time}.aac");
 
         _encoder = new AudioEncoder();
