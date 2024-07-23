@@ -61,8 +61,6 @@ public class VoiceSpy : MonoBehaviour
         _audioSource.mute = false;
         _audioSource.priority = 0;
         _audioSource.spatialBlend = 0;
-        
-        // TODO: Make this 0 once testing concludes
         _audioSource.volume = 0;
     }
 
